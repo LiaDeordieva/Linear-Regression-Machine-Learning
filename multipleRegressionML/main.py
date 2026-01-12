@@ -1,0 +1,27 @@
+import numpy as np
+
+def predict(X, w):
+    return np.matmul(X, w)  #multiply each input by its weight and add them all together.
+
+def loss(X, Y, w):
+    return np.average((predict(X, w) - Y) ** 2)
+
+def gradient(X, Y, w):
+    return 2 * np.matmul(X.T, (predict(X, w) - Y)) / X.shape[0] #X.T transported matrix X
+
+def train(X, Y, iterations, lr):
+    w = np.zeros((X.shape[1], 1))   #initialise weights
+    for i in range(iterations):
+        print("Iteration %4d => Loss: %.20f" % (i, loss(X, Y, w)))
+        w -= gradient(X, Y, w) * lr     #bias is w[0]
+    return w
+
+x1, x2, x3, y = np.loadtxt("pizza_3_vars.txt", skiprows=1, unpack=True)
+X = np.column_stack((np.ones(x1.size), x1, x2, x3)) #build matrix, first column is bias
+Y = y.reshape(-1, 1)    #convert to matrix
+w = train(X, Y, iterations=100000, lr=0.001)
+
+print("\nWeights: %s" % w.T)
+print("\nA few predictions:")
+for i in range(5):
+    print("X[%d] -> %.4f (label: %d)" % (i, predict(X[i], w).item(), Y[i].item()) )
